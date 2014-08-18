@@ -1,0 +1,11 @@
+/* main.css */
+body {
+    background-color: #ccc;
+    padding: 6px;
+}
+H1{
+    color:darkblue;
+}
+#message{
+    color:darkred;
+}
