@@ -22,6 +22,10 @@ handlers:
 
 - url: /admin
   script: _go_app
+  login: required
+
+- url: /tst
+  script: _go_app
 
 - url: /.*
   static_files:  index.html

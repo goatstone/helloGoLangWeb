@@ -5,8 +5,9 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-//	"log"
 	"path/filepath"
+	"goatstone/data"
+	"appengine"
 )
 
 var (
@@ -40,6 +41,9 @@ var inputs = []input{
 }
 
 func HandleTemplate(w http.ResponseWriter, r *http.Request) {
+
+	ctx := appengine.NewContext(r)
+	data.StoreLog(ctx, "HandleTemplate")
 
 	cwd, _ := os.Getwd()
 	var (
