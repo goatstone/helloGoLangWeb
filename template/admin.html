@@ -2,10 +2,32 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Admin</title>
+    <title>{{.Title }}</title>
+    <style>
+        h1 {
+            margin: 0
+        }
+
+        label {
+            display: block;
+            float: left;
+            clear: left;
+        }
+    </style>
 </head>
 <body>
-GO !!!
-{{.}}
+<h1>Admin</h1>
+<fieldset>
+    <legend>{{.Legend}}</legend>
+    {{range .Inputs }}
+
+    <label>{{.Label}}
+        <input name="" value="">
+    </label>
+
+    {{end}}
+
+</fieldset>
+
 </body>
 </html>

@@ -7,5 +7,5 @@ import (
 )
 func init() {
 	http.HandleFunc("/admin", admin.HandleTemplate)
-	log.Print("inits :  " , admin.I)
+	log.Print("inits :  " , 12)
 }

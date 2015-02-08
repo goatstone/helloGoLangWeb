@@ -9,37 +9,53 @@ import (
 	"path/filepath"
 )
 
-var yourId int = 0
-var I = 1333332;
+var (
+	title               = "goatstone : go : admin"
+	legend              = "Admin Values!"
+	templatePath string = "./template/admin.html"
+	templateName string = "admin.html"
+	count int           = 0
+)
 
-func  retI()( i int){
-	i = 9
-	return
+type templateData struct {
+	Title      string
+	Legend     string
+	Inputs     []input
 }
+type input struct {
+	Label     string
+	name      string
+	value     string
+	inputType string
+}
+
+var inputs = []input{
+	{"Label 0", "name0", "val0", "text"},
+	{"Label 1", "name1", "val1", "text"},
+	{"Label 2", "name2", "val2", "text"},
+	{"Label 3", "name3", "val3", "text"},
+	{"Label 4", "name4", "val4", "text"},
+}
+
 func HandleTemplate(w http.ResponseWriter, r *http.Request) {
-	log.Print("inits 1", yourId)
-	if r.URL.Path != "/admin" {
-		http.NotFound(w, r)
-		return
-	}
-	type AStrct struct {
-		a, b, c int
-	}
+	log.Print("admin::: ", count)
+	td := templateData{Title:title }
+	td.Inputs = inputs
+	td.Legend = legend
 	cwd, _ := os.Getwd()
-	adminFilePath := filepath.Join(cwd, "./template/admin.html")
 	var (
-		templates = template.Must(template.ParseFiles(adminFilePath))
+		templates = template.Must(
+	template.ParseFiles(
+	filepath.Join(cwd, templatePath)))
 	)
-	m := AStrct{a:1}
-	m.b = yourId
 	if r.Method != "POST" {
 		out := &bytes.Buffer{}
-		if err := templates.ExecuteTemplate(out, "admin.html", m); err != nil {
+		if err := templates.ExecuteTemplate(out, templateName, td); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		out.WriteTo(w)
-		yourId++
+		count++
 		return
 	}
 }
