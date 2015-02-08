@@ -3,9 +3,9 @@ package helloGoLangWeb
 import (
 	"net/http"
 	"log"
-	 "goatstone"
+	 "goatstone/form/admin"
 )
 func init() {
-	http.HandleFunc("/admin", goatstone.HandleTemplate)
-	log.Print("inits :  " , goatstone.I)
+	http.HandleFunc("/admin", admin.HandleTemplate)
+	log.Print("inits :  " , admin.I)
 }

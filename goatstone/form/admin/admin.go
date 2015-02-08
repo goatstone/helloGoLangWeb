@@ -1,4 +1,4 @@
-package goatstone
+package admin
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 )
 
 var yourId int = 0
-var I = 12;
+var I = 1333332;
 
 func  retI()( i int){
 	i = 9
