@@ -20,7 +20,7 @@ handlers:
   static_files: login.html
   upload: login.html
 
-- url: /templates
+- url: /admin
   script: _go_app
 
 - url: /.*
