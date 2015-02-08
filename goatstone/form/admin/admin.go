@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-	"log"
+//	"log"
 	"path/filepath"
 )
 
@@ -49,17 +49,21 @@ func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 	)
 	td := templateData{Title:title }
 	if r.Method == "POST" {
-		log.Print("admin::: ", r.FormValue("name0"))
 		td.Legend = legend
 		// set inputs to disabled
-		inputs[0].Disabled = "disabled"
-		inputs[0].Value = r.FormValue("name0")
+		for ip := range inputs {
+			inputs[ip].Disabled = "disabled"
+			inputs[ip].Value = r.FormValue(inputs[ip].Name)
+		}
 		td.Inputs = inputs
 		td.Message = " Return to edit form"
 		td.AHref = "/admin"
 	}
 	if r.Method != "POST" {
-		inputs[0].Disabled = ""
+		// set inputs to active
+		for ip := range inputs {
+			inputs[ip].Disabled = ""
+		}
 		td.Inputs = inputs
 		td.Legend = legend
 	}
