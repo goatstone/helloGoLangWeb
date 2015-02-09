@@ -47,8 +47,7 @@ func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 
 	cwd, _ := os.Getwd()
 	var (
-		templates = template.Must(
-	template.ParseFiles(
+		templates = template.Must(template.ParseFiles(
 	filepath.Join(cwd, templatePath)))
 	)
 	td := templateData{Title:title }
@@ -62,6 +61,11 @@ func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 		td.Inputs = inputs
 		td.Message = " Return to edit form"
 		td.AHref = "/admin"
+		args := []string{
+			r.FormValue("name0"), r.FormValue("name1"),
+			r.FormValue("name2"), r.FormValue("name3"),
+			r.FormValue("name4"), }
+		data.StoreSiteInfo(ctx, args)
 	}
 	if r.Method != "POST" {
 		// set inputs to active

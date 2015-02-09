@@ -7,7 +7,6 @@ import (
 	"math/rand"
 	"time"
 	"appengine/user"
-
 )
 
 type Entity struct {
@@ -18,7 +17,14 @@ type appLog struct {
 	Name      string
 	Id        int
 	TimeStamp time.Time
-	Account  string
+	Account   string
+}
+type siteInfo struct {
+	Title           string
+	Header          string
+	Message         string
+	Color           string
+	BackgroundColor string
 }
 
 func StoreLog(ctx appengine.Context, name string) {
@@ -37,19 +43,14 @@ func StoreLog(ctx appengine.Context, name string) {
 	}
 
 }
-func store(ctx appengine.Context,) {
-
-	dataKey := datastore.NewIncompleteKey(ctx, "Entity", nil)
-
-	entity := &Entity{}
-	entity.Value = "value one" // random value here
-	entity.Count = rand.Intn(1000)
-
-	if _, err := datastore.Put(ctx, dataKey, entity); err != nil {
+func StoreSiteInfo(ctx appengine.Context, args []string) {
+	dataKey := datastore.NewKey(ctx, "SiteInfo", "siteinfo", 0, nil)
+	si := &siteInfo{args[0], args[1], args[2], args[3], args[4]}
+	if _, err := datastore.Put(ctx, dataKey, si); err != nil {
 		log.Print("err:  ", err)
 		return
 	}
-	log.Print("store", entity.Count)
+	//log.Print("store", si.Title)
 }
 
 //func StoreCredentials(cred *Credentials, ctx appengine.Context) (err error) {
