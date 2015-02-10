@@ -75,7 +75,7 @@ func GetSiteProps(ctx appengine.Context) (siteProps []SiteProp , err error) {
 	q := datastore.NewQuery("SiteProperties")
 	_, err = q.GetAll(ctx, &siteProps)
 	if err != nil {
-		log.Print("error:::::::::  ", err)
+		log.Print("ERROR :  ", err)
 		return
 	}
 	return

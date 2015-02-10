@@ -29,13 +29,6 @@ func populateData(ctx appengine.Context) {
 func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	data.StoreLog(ctx, "HandleTemplate")
-	var siteProps  []data.SiteProp
-	siteProps, err := data.GetSiteProps(ctx)
-	if err != nil {
-		log.Print("get site prop admin -------  ", err)
-		http.Error(w, "Problem Getting Site Properties.", 500)
-		return
-	}
 	method := "get"
 	if r.Method == "POST" {
 		method = "update"
@@ -47,28 +40,30 @@ func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 		templates = template.Must(template.ParseFiles(filepath.Join(cwd, templatePath)))
 	)
 	templatedata := data.TemplateData{}
+	var siteProps  []data.SiteProp
+	siteProps, err := data.GetSiteProps(ctx)
+	if err != nil {
+		log.Print("ERROR : GetSiteProps :  ", err)
+		http.Error(w, "Problem Getting Site Properties.", 500)
+		return
+	}
 	if method == "update" {
+		log.Print("update  :  ")
 		args := []string{
 			r.FormValue("0"), r.FormValue("1"),
 			r.FormValue("2"), r.FormValue("3"),
 			r.FormValue("4"), }
-		if err := data.StoreSiteInfo(ctx, args); err != nil {
-			http.Error(w, "Problem Storing Site Infromation.", 500)
-		}
+		_ = args
 		templatedata.Legend = "Posted Values"
 		// set inputs to disabled
-		//		for ip := range inputs {
-		//			inputs[ip].Disabled = "disabled"
-		//			inputs[ip].Value = r.FormValue(inputs[ip].Name) // TODO Get data from DB
-		//		}
-		//templatedata.Inputs = inputs
+		for k, v := range siteProps {
+			siteProps[k].Disabled = "disabled"
+			log.Print("k: ", k, " v: ", v.Disabled, v.Value)
+		}
+		templatedata.Inputs = siteProps
 		templatedata.Message = " Return to edit form"
 		templatedata.AHref = "/admin"
 	} else if method == "get" {
-		for k, val := range siteProps {
-			log.Print("- - - - -", val.Name, " : ", val.Value, " : ", val.FormLabel)
-			_ = k
-		}
 		templatedata.Inputs = siteProps
 		templatedata.Legend = "GET!"
 	}
