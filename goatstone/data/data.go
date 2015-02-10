@@ -10,10 +10,6 @@ import (
 
 )
 
-type Entity struct {
-	Value string
-	Count int
-}
 type appLog struct {
 	Name      string
 	Id        int
@@ -26,6 +22,13 @@ type SiteInfo struct {
 	Message         string
 	Color           string
 	BackgroundColor string
+}
+type TemplateData struct {
+	Title      string
+	Legend     string
+	Inputs     []SiteProp
+	Message    string
+	AHref      string
 }
 type SiteProp struct {
 	Name          string
@@ -75,7 +78,6 @@ func GetSiteProps(ctx appengine.Context) (siteProps []SiteProp , err error) {
 		log.Print("error:::::::::  ", err)
 		return
 	}
-	_ = q
 	return
 }
 func StoreSiteInfo(ctx appengine.Context, args []string) (err error) {
