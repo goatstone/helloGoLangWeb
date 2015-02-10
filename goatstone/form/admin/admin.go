@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"goatstone/data"
 	"appengine"
-	//		"log"
+	"log"
 )
 
 var (
@@ -40,7 +40,8 @@ var inputs = []input{
 	{"Color", "3", "val3", "text", ""},
 	{"Background Color 4", "4", "val4", "text", ""},
 }
-func populateData(ctx appengine.Context){
+
+func populateData(ctx appengine.Context) {
 
 	prop := map[string]string{"Name":"title", "Value":"Goatstone : Go", }
 	data.AddSiteProp(ctx, prop)
@@ -51,18 +52,18 @@ func populateData(ctx appengine.Context){
 func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	data.StoreLog(ctx, "HandleTemplate")
-
+	method := "get"
+	if r.Method == "POST" {
+		method = "update"
+	}
 	// RUN ON INITIALIZATION
 	//populateData(ctx)
-
 	cwd, _ := os.Getwd()
 	var (
-		templates = template.Must(template.ParseFiles(
-	filepath.Join(cwd, templatePath)))
+		templates = template.Must(template.ParseFiles(filepath.Join(cwd, templatePath)))
 	)
 	templatedata := templateData{Title:title }
-	if r.Method == "POST" {
-
+	if method == "update" {
 		args := []string{
 			r.FormValue("0"), r.FormValue("1"),
 			r.FormValue("2"), r.FormValue("3"),
@@ -70,7 +71,6 @@ func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 		if err := data.StoreSiteInfo(ctx, args); err != nil {
 			http.Error(w, "Problem Storing Site Infromation.", 500)
 		}
-
 		templatedata.Legend = "Posted Values"
 		// set inputs to disabled
 		for ip := range inputs {
@@ -80,15 +80,14 @@ func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 		templatedata.Inputs = inputs
 		templatedata.Message = " Return to edit form"
 		templatedata.AHref = "/admin"
-
 	}
-	if r.Method != "POST" {
+	if method == "get" {
+		log.Print("-=====", method)
 		si, err := data.GetSiteInfo(ctx);
 		if err != nil {
 			http.Error(w, "Problem Getting Site Infromation.", 500)
 		}
 		_ = si
-
 		//log.Print("hello ", si.Title)
 		//		si = data.GetSiteInfo(ctx)
 		// set inputs to active
