@@ -67,6 +67,17 @@ func AddSiteProp(ctx appengine.Context, prop map[string]string) (err error) {
 	}
 	return
 }
+func GetSiteProps(ctx appengine.Context) (siteProps []SiteProp , err error) {
+	siteProps = []SiteProp{}
+	q := datastore.NewQuery("SiteProperties")
+	_, err = q.GetAll(ctx, &siteProps)
+	if err != nil {
+		log.Print("error:::::::::  ", err)
+		return
+	}
+	_ = q
+	return
+}
 func StoreSiteInfo(ctx appengine.Context, args []string) (err error) {
 	dataKey := datastore.NewKey(ctx, "SiteInfo", "siteinfo", 0, nil)
 	si := &SiteInfo{args[0], args[1], args[2], args[3], args[4]}

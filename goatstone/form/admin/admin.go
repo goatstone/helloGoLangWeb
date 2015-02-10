@@ -52,6 +52,18 @@ func populateData(ctx appengine.Context) {
 func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	data.StoreLog(ctx, "HandleTemplate")
+
+	siteProps, err := data.GetSiteProps(ctx)
+	if err != nil {
+		log.Print("get site prop admin -------  ", err)
+		http.Error(w, "Problem Getting Site Properties.", 500)
+		return
+	}
+	for k, val := range siteProps {
+		log.Print("===================", val.Name, " : ", val.Value, " : ", val.FormLabel)
+		_ = k
+	}
+
 	method := "get"
 	if r.Method == "POST" {
 		method = "update"
