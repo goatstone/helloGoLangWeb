@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"goatstone/data"
 	"appengine"
+	//		"log"
 )
 
 var (
@@ -33,50 +34,74 @@ type input struct {
 }
 
 var inputs = []input{
-	{"Label 0", "name0", "val0", "text", ""},
-	{"Label 1", "name1", "val1", "text", ""},
-	{"Label 2", "name2", "val2", "text", ""},
-	{"Label 3", "name3", "val3", "text", ""},
-	{"Label 4", "name4", "val4", "text", ""},
+	{"Title", "0", "val0", "text", ""},
+	{"Heading", "1", "val1", "text", ""},
+	{"Message", "2", "val2", "text", ""},
+	{"Color", "3", "val3", "text", ""},
+	{"Background Color 4", "4", "val4", "text", ""},
 }
+func populateData(ctx appengine.Context){
 
+	prop := map[string]string{"Name":"title", "Value":"Goatstone : Go", }
+	data.AddSiteProp(ctx, prop)
+	prop = map[string]string{"Name":"heading", "Value":"Welcome!", }
+	data.AddSiteProp(ctx, prop)
+
+}
 func HandleTemplate(w http.ResponseWriter, r *http.Request) {
-
 	ctx := appengine.NewContext(r)
 	data.StoreLog(ctx, "HandleTemplate")
+
+	// RUN ON INITIALIZATION
+	//populateData(ctx)
 
 	cwd, _ := os.Getwd()
 	var (
 		templates = template.Must(template.ParseFiles(
 	filepath.Join(cwd, templatePath)))
 	)
-	td := templateData{Title:title }
+	templatedata := templateData{Title:title }
 	if r.Method == "POST" {
-		td.Legend = legend
+
+		args := []string{
+			r.FormValue("0"), r.FormValue("1"),
+			r.FormValue("2"), r.FormValue("3"),
+			r.FormValue("4"), }
+		if err := data.StoreSiteInfo(ctx, args); err != nil {
+			http.Error(w, "Problem Storing Site Infromation.", 500)
+		}
+
+		templatedata.Legend = "Posted Values"
 		// set inputs to disabled
 		for ip := range inputs {
 			inputs[ip].Disabled = "disabled"
-			inputs[ip].Value = r.FormValue(inputs[ip].Name)
+			inputs[ip].Value = r.FormValue(inputs[ip].Name) // TODO Get data from DB
 		}
-		td.Inputs = inputs
-		td.Message = " Return to edit form"
-		td.AHref = "/admin"
-		args := []string{
-			r.FormValue("name0"), r.FormValue("name1"),
-			r.FormValue("name2"), r.FormValue("name3"),
-			r.FormValue("name4"), }
-		data.StoreSiteInfo(ctx, args)
+		templatedata.Inputs = inputs
+		templatedata.Message = " Return to edit form"
+		templatedata.AHref = "/admin"
+
 	}
 	if r.Method != "POST" {
+		si, err := data.GetSiteInfo(ctx);
+		if err != nil {
+			http.Error(w, "Problem Getting Site Infromation.", 500)
+		}
+		_ = si
+
+		//log.Print("hello ", si.Title)
+		//		si = data.GetSiteInfo(ctx)
 		// set inputs to active
 		for ip := range inputs {
+			//log.Print("inputs: ", ip, inputs[ip])
 			inputs[ip].Disabled = ""
 		}
-		td.Inputs = inputs
-		td.Legend = legend
+		//inputs[0][1] = si.Title
+		templatedata.Inputs = inputs
+		templatedata.Legend = "GET!"
 	}
 	out := &bytes.Buffer{}
-	if err := templates.ExecuteTemplate(out, templateName, td); err != nil {
+	if err := templates.ExecuteTemplate(out, templateName, templatedata); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
