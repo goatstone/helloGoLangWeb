@@ -18,29 +18,6 @@ var (
 	templateName string = "admin.html"
 )
 
-type templateData struct {
-	Title      string
-	Legend     string
-	Inputs     []input
-	Message    string
-	AHref      string
-}
-type input struct {
-	Label     string
-	Name      string
-	Value     string
-	inputType string
-	Disabled  string
-}
-
-var inputs = []input{
-	{"Title", "0", "val0", "text", ""},
-	{"Heading", "1", "val1", "text", ""},
-	{"Message", "2", "val2", "text", ""},
-	{"Color", "3", "val3", "text", ""},
-	{"Background Color 4", "4", "val4", "text", ""},
-}
-
 func populateData(ctx appengine.Context) {
 
 	prop := map[string]string{"Name":"title", "Value":"Goatstone : Go", }
@@ -62,41 +39,32 @@ func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 	var (
 		templates = template.Must(template.ParseFiles(filepath.Join(cwd, templatePath)))
 	)
-	templatedata := templateData{Title:title }
+	templatedata := data.TemplateData{}
+	var siteProps  []data.SiteProp
+	siteProps, err := data.GetSiteProps(ctx)
+	if err != nil {
+		log.Print("ERROR : GetSiteProps :  ", err)
+		http.Error(w, "Problem Getting Site Properties.", 500)
+		return
+	}
 	if method == "update" {
+		log.Print("update  :  ")
 		args := []string{
 			r.FormValue("0"), r.FormValue("1"),
 			r.FormValue("2"), r.FormValue("3"),
 			r.FormValue("4"), }
-		if err := data.StoreSiteInfo(ctx, args); err != nil {
-			http.Error(w, "Problem Storing Site Infromation.", 500)
-		}
+		_ = args
 		templatedata.Legend = "Posted Values"
 		// set inputs to disabled
-		for ip := range inputs {
-			inputs[ip].Disabled = "disabled"
-			inputs[ip].Value = r.FormValue(inputs[ip].Name) // TODO Get data from DB
+		for k, v := range siteProps {
+			siteProps[k].Disabled = "disabled"
+			log.Print("k: ", k, " v: ", v.Disabled, v.Value)
 		}
-		templatedata.Inputs = inputs
+		templatedata.Inputs = siteProps
 		templatedata.Message = " Return to edit form"
 		templatedata.AHref = "/admin"
-	}
-	if method == "get" {
-		log.Print("-=====", method)
-		si, err := data.GetSiteInfo(ctx);
-		if err != nil {
-			http.Error(w, "Problem Getting Site Infromation.", 500)
-		}
-		_ = si
-		//log.Print("hello ", si.Title)
-		//		si = data.GetSiteInfo(ctx)
-		// set inputs to active
-		for ip := range inputs {
-			//log.Print("inputs: ", ip, inputs[ip])
-			inputs[ip].Disabled = ""
-		}
-		//inputs[0][1] = si.Title
-		templatedata.Inputs = inputs
+	} else if method == "get" {
+		templatedata.Inputs = siteProps
 		templatedata.Legend = "GET!"
 	}
 	out := &bytes.Buffer{}

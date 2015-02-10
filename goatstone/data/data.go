@@ -10,10 +10,6 @@ import (
 
 )
 
-type Entity struct {
-	Value string
-	Count int
-}
 type appLog struct {
 	Name      string
 	Id        int
@@ -26,6 +22,13 @@ type SiteInfo struct {
 	Message         string
 	Color           string
 	BackgroundColor string
+}
+type TemplateData struct {
+	Title      string
+	Legend     string
+	Inputs     []SiteProp
+	Message    string
+	AHref      string
 }
 type SiteProp struct {
 	Name          string
@@ -64,6 +67,16 @@ func AddSiteProp(ctx appengine.Context, prop map[string]string) (err error) {
 	dataKey := datastore.NewKey(ctx, "SiteProperties", keyName, 0, nil)
 	if _, err := datastore.Put(ctx, dataKey, sp); err != nil {
 		log.Print("err::  ", err)
+	}
+	return
+}
+func GetSiteProps(ctx appengine.Context) (siteProps []SiteProp , err error) {
+	siteProps = []SiteProp{}
+	q := datastore.NewQuery("SiteProperties")
+	_, err = q.GetAll(ctx, &siteProps)
+	if err != nil {
+		log.Print("ERROR :  ", err)
+		return
 	}
 	return
 }
