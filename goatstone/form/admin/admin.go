@@ -19,12 +19,10 @@ var (
 )
 
 func populateData(ctx appengine.Context) {
-
 	prop := map[string]string{"Name":"title", "Value":"Goatstone : Go", }
 	data.AddSiteProp(ctx, prop)
 	prop = map[string]string{"Name":"heading", "Value":"Welcome!", }
 	data.AddSiteProp(ctx, prop)
-
 }
 func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
@@ -48,19 +46,15 @@ func HandleTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if method == "update" {
-		log.Print("update  :  ")
-		args := []string{
-			r.FormValue("0"), r.FormValue("1"),
-			r.FormValue("2"), r.FormValue("3"),
-			r.FormValue("4"), }
-		_ = args
-		templatedata.Legend = "Posted Values"
-		// set inputs to disabled
 		for k, v := range siteProps {
+			// update the value of the site property
+			siteProps[k].Value = r.FormValue(v.Name);
+			data.UpdateSiteProp(ctx, siteProps[k])
+			// set inputs to disabled
 			siteProps[k].Disabled = "disabled"
-			log.Print("k: ", k, " v: ", v.Disabled, v.Value)
 		}
 		templatedata.Inputs = siteProps
+		templatedata.Legend = "Posted Values"
 		templatedata.Message = " Return to edit form"
 		templatedata.AHref = "/admin"
 	} else if method == "get" {
